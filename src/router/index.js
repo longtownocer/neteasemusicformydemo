@@ -3,8 +3,9 @@ import Router from 'vue-router'
 import Home from '@/components/root/Home'
 import Login from '@/components/users/login'
 import SongsListDetail from '@/components/songs/SongsListDetail'
+import recommend from '@/components/songs/recommend'
+import songsquare from '@/components/songs/songsquare'
 
-import slider from '@/components/slidecomponents/slider'
 // import load from '@/components/load/loaddata'
 
 Vue.use(Router)
@@ -27,9 +28,14 @@ export default new Router({
             component: SongsListDetail
         },
         {
-            path: '/slider',
-            name: 'slider',
-            component: slider
+            name: 'resource',
+            path: '/resource/:id',
+            component: recommend
         },
+        {
+            name: 'songsquare',
+            path: '/songsquare',
+            component: songsquare
+        }
     ]
 })

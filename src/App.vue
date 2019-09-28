@@ -1,11 +1,8 @@
 <template>
     <div id="app">
-        <navigation>
-            <keep-alive include="home">
-                <router-view @switch="switchsong"/>
-            </keep-alive>
-        </navigation>
-
+        <keep-alive include="home,Songssquare">
+            <router-view @switch="switchsong" ref="musicCmp"/>
+        </keep-alive>
         <player ref="player"></player>
     </div>
 </template>
@@ -21,7 +18,26 @@
         },
         methods: {
             switchsong(newinfo, lyric) {
+                console.log('switch')
                 this.$refs.player.switchsong(newinfo, lyric)
+            },
+            playlist(i) {
+                this.$refs.musicCmp.playsong(i)
+            },
+            next(index) {
+                this.$refs.musicCmp.playsong(index)
+            },
+            playsong(i, id) {
+                this.$refs.player.playsong(i, id)
+            },
+            clearLyric() {
+                this.$refs.player.clearLyric()
+            },
+            removecurrent() {
+                this.$refs.player.removecurrent()
+            },
+            resetHeight(){
+                this.$refs.player.resetLyricposition()
             }
         },
         created() {
@@ -59,6 +75,13 @@
         text-align: center;
         color: #2c3e50;
         padding-bottom: 45px;
+        overflow: hidden;
+        /*height: 1rem;*/
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
 
 
     }

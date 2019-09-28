@@ -1,8 +1,7 @@
 <template>
-
     <div class="root-songslist">
-        <load v-if="loadflag"></load>
-        <div class="content" v-else="loadflag">
+        <load v-show="loadflag"></load>
+        <div class="content">
             <div class="top-bar">
                 <div class="back" @click="goback">
                     <van-icon name="arrow-left"/>
@@ -12,9 +11,10 @@
                 </div>
             </div>
             <div class="top-bgc">
+                <img src="http://p1.music.126.net/_f8R60U9mZ42sSNvdPn2sQ==/109951162868126486.jpg" alt="">
             </div>
             <div class="songslist-container">
-                <div class="play-choice">
+                <div class="play-choice" v-show="!loadflag">
                     <div class="left">
                         <span><van-icon name="play-circle-o"></van-icon></span>
                         <span class="crls">播放全部</span>
@@ -25,45 +25,43 @@
                     </div>
                 </div>
                 <div class="songs-all-list">
-                    <div class="songs-eachlist-current" v-for="(item,i) in songslistInfo" :key="i" @click="playsong(i)">
+                    <div class="songs-eachlist-current" v-for="(item,i) in songslistInfo" :key="i"
+                         @click="playsong(i,item.id)">
                         <div class="each-list">
                             <div class="songsInfo">
                                 <img :src="item.album.blurPicUrl" alt="">
+                                <van-icon name="volume-o" v-if="item.id==$store.state.currentid"></van-icon>
                             </div>
                             <div>
-                                <span><van-icon name="tv-o"></van-icon></span>
+                                <span><van-icon name="tv-o" v-if="item.mvid!==0"></van-icon></span>
                                 <span><van-icon name="more-o"></van-icon></span>
                             </div>
                         </div>
                         <div class="aticle">
                             <b>{{item.name}}</b>
-                            <b>{{item.artists[0].name}}-{{item.album.name|omit}}</b>
+                            <b>{{item.artists[0].name}}-{{item.album.name}}</b>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </template>
 <script>
-    import load from '../load/loaddata.vue'
-    import song from "@/api/song/song";
+    import load from '@/components/load/loaddata'
+    import Asynchronous from '@/api/asyc/asyc'
 
     export default {
         data() {
             return {
-                baseUrl: 'http://localhost:3000',
                 songslistInfo: [],
                 loadflag: true,
-                songarr: []
+                songarr: [],
             }
         },
         methods: {
-            // /recommend/songs
-
             getsongslistinfo() {
-                this.Asynchronous({
+                Asynchronous({
                     type: 'get',
                     url: '/recommend/songs',
                     params: {
@@ -74,88 +72,57 @@
                     this.loadflag = false
                 })
             },
-
-            Asynchronous(objparams) {
-                return new Promise((reject) => {
-                    $.ajax({
-                        type: objparams.type,
-                        url: this.baseUrl + objparams.url,
-                        data: objparams.params,
-                        xhrFields: {withCredentials: true}
-                    }).then((ret) => {
-                        reject(ret)
-                    }).catch((err) => {
-                        console.log(err)
-                    })
-                })
-            },
             goback() {
                 this.$router.go(-1)
             },
-            playsong(i) {
-                if (this.songarr.length == 0) {
-                    this.songslistInfo.forEach((item, i) => {
-                        this.songarr.push(item.id)
-                    })
-                }
-                //获取歌词
-                let newsinfo = {}
-                let lyric = ''
-                this.Asynchronous({
-                    type: 'get',
-                    url: '/lyric',
-                    params: {
-                        id: this.songslistInfo[i].id
+            scroll() {
+                $('.root-songslist').scroll(function () {
+                    if ($(this)[0].scrollTop >= 230) {
+                        $('.play-choice').css({
+                            'position': 'fixed',
+                            'width': '100%',
+                            'top': '40px',
+                            'overflow': 'hidden',
+                            'padding': '10px 15px',
+                        })
+                        $('.songs-all-list').css({'margin-top': '41px'})
+                    } else {
+                        $('.play-choice').css({'position': ''})
+                        $('.songs-all-list').css({'margin-top': ''})
                     }
-                }).then((ret) => {
-                    lyric = ret.lrc.lyric
-                    return this.Asynchronous({
-                        type: 'get',
-                        url: '/song/url',
-                        params: {
-                            id: this.songarr[i],
-                            timestamp: Date.now()
-                        }
-                    })
-                }).then((ret) => {      //  //获取歌曲url
-                    newsinfo = {
-                        name: this.songslistInfo[i].name,
-                        artist: this.songslistInfo[i].artists[0].name,
-                        audiosrc: ret.data[0].url,
-                        pictrue_url: this.songslistInfo[i].album.blurPicUrl
-                    }
-                    this.$emit('switch',newsinfo, lyric)
-
                 })
+            },
+            playsong(i, id) {
+                if (this.songarr.length == 0 || this.$store.state.songslist.length < this.songslistInfo.length) {
+                    let arr = []
+                    this.songslistInfo.forEach((item, i) => {
+                        arr.push({
+                            name: item.name,
+                            artist: item.artists[0].name,
+                            id: item.id,
+                            picUrl: item.album.blurPicUrl,
+                            album: item.album.name
+                        })
+                    })
+                    this.$store.dispatch('updatesongLIst', this.deepCopy(arr))
+                    this.songarr.push('finished')
+                }
+                this.$parent.clearLyric()
+                this.$parent.playsong(i, id)
+                this.$parent.removecurrent()
+            },
+            deepCopy(obj) {
+                return JSON.parse(JSON.stringify(obj))
             }
         },
         created() {
+            if (!this.$store.state.logininfo) {
+                return this.$router.push({path: '/login'})
+            }
             this.getsongslistinfo()
-            let now = Date.now()
-            //console.log(now)
         },
         mounted() {
-
-
-        },
-        updated() {
-            $('.root-songslist').scroll(function () {
-                if ($(this)[0].scrollTop >= 160) {
-                    $('.play-choice').css({
-                        'position': 'fixed',
-                        'width': '100%',
-                        'top': '40px',
-                        'overflow': 'hidden',
-                        'padding': '10px 0',
-                    }).find('.left').css({
-                        'margin-left': '15px'
-                    }).siblings('.right').css({
-                        'margin-right': '15px'
-                    })
-                } else {
-                    $('.play-choice').css({'position': 'static'})
-                }
-            })
+            this.scroll()
         },
         components: {
             load
@@ -178,8 +145,8 @@
         height: 100%;
         width: 100%;
         overflow: scroll;
-        background: url("../../img/u=481794964,3146825451&fm=26&gp=0.jpg") 0 40px no-repeat;
         background-size: 100%;
+
 
         .top-bar {
             position: fixed;
@@ -189,7 +156,7 @@
             width: 100%;
             display: flex;
             justify-content: space-between;
-            background-color: rgba(255, 255, 255, 0.97);
+            background-color: #fff;
             flex-direction: row;
             align-items: center;
             height: 40px;
@@ -211,10 +178,14 @@
 
         .top-bgc {
             width: 100%;
-            height: 200px;
+            height: 270px;
             z-index: 99999;
             overflow: hidden;
-            /*transform: translateZ(10px);*/
+
+            img {
+                width: 100%;
+                filter: brightness(1.5);
+            }
         }
 
         .songslist-container {
@@ -229,9 +200,9 @@
                 flex-direction: row;
                 align-items: center;
                 padding: 10px 15px;
-                background-color: #faffff;
+                background-color: #fff;
                 z-index: 99;
-                border-radius: 10px 10px 0 0;
+                box-sizing: border-box;
 
                 div {
                     display: flex;
@@ -266,7 +237,7 @@
             .songs-all-list {
 
                 padding: 15px;
-                padding-bottom: 50px;
+                padding-bottom: 60px;
 
                 .songs-eachlist-current {
                     margin-bottom: 20px;
@@ -279,6 +250,13 @@
                         position: absolute;
                         top: 3px;
                         left: 48px;
+                        width: 70%;
+
+                        b {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
 
                         b:nth-of-type(1) {
                             font-weight: normal;
@@ -335,6 +313,23 @@
                             display: flex;
                             flex-direction: row;
                             align-items: center;
+                            position: relative;
+                            text-align: center;
+
+                            i {
+                                position: absolute;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                background-color: #fff;
+                                color: red;
+                                width: 100%;
+                                height: 100%;
+                                line-height: 40px;
+                                font-size: 16px;
+                                font-weight: 700;
+                                background-color: #faf4ff;
+                            }
 
                             img {
                                 width: 40px;

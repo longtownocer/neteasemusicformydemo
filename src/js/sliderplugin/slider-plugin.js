@@ -1,6 +1,14 @@
 import Swiper from 'swiper'
+
 export default {
-    setSlider() {
+    activeIndex: 0,
+    swipers: {},
+    slidespeed: 300,
+    init() {
+        this.setSlider()
+    },
+    setSlider(callback) {
+        const that = this
         let ReferenceError
         let navSlideWidth
         let bar
@@ -18,15 +26,20 @@ export default {
         //暂时设计每个slide大小需要一致
         let barwidth = 36 //导航粉色条的长度px
         let tSpeed = 300 //切换速度300ms
+        let sliSpeed = 0
         var navSwiper = new Swiper('#nav', {
             slidesPerView: 6,
             freeMode: true,
+            initialSlide: 0,
             on: {
                 init: function () {
                     navSlideWidth = this.slides.eq(0).css('width'); //导航字数需要统一,每个导航宽度一致
                     bar = this.$el.find('.bar')
                     bar.css('width', navSlideWidth)
+
+                    // that.transpeed(bar, 300)
                     bar.transition(tSpeed)
+
                     navSum = this.slides[this.slides.length - 1].offsetLeft //最后一个slide的位置
                     clientWidth = parseInt(this.$wrapperEl.css('width')) //Nav的可视宽度
                     navWidth = 0
@@ -42,7 +55,7 @@ export default {
         var pageSwiper = new Swiper('#page', {
             watchSlidesProgress: true,
             resistanceRatio: 0,
-            initialSlide: 1,
+            initialSlide: 0,
             on: {
                 touchMove: function () {
                     let progress
@@ -64,18 +77,24 @@ export default {
                     activeIndex = this.activeIndex
                     activeSlidePosition = navSwiper.slides[activeIndex].offsetLeft
                     //释放时导航粉色条移动过渡
-                    bar.transition(tSpeed)
+                    that.transpeed()
+                    bar.transition(that.slidespeed)
+
+                    //  that.transpeed(bar, tSpeed)
+
                     bar.transform('translateX(' + activeSlidePosition + 'px)')
                     //释放时文字变色过渡
-                    navSwiper.slides.eq(activeIndex).find('span').transition(tSpeed)
-                    navSwiper.slides.eq(activeIndex).find('span').css('color', 'rgba(255,72,145,1)')
-                    if (activeIndex > 0) {
-                        navSwiper.slides.eq(activeIndex - 1).find('span').transition(tSpeed)
-                        navSwiper.slides.eq(activeIndex - 1).find('span').css('color', 'rgba(51,51,51,1)')
-                    }
-                    if (activeIndex < this.slides.length) {
-                        navSwiper.slides.eq(activeIndex + 1).find('span').transition(tSpeed)
-                        navSwiper.slides.eq(activeIndex + 1).find('span').css('color', 'rgba(51,51,51,1)')
+                    if (that.slidespeed !== 0) {
+                        navSwiper.slides.eq(activeIndex).find('span').transition(tSpeed)
+                        navSwiper.slides.eq(activeIndex).find('span').css('color', 'rgb(255,40,78)')
+                        if (activeIndex > 0) {
+                            navSwiper.slides.eq(activeIndex - 1).find('span').transition(tSpeed)
+                            navSwiper.slides.eq(activeIndex - 1).find('span').css('color', 'rgba(51,51,51,1)')
+                        }
+                        if (activeIndex < this.slides.length) {
+                            navSwiper.slides.eq(activeIndex + 1).find('span').transition(tSpeed)
+                            navSwiper.slides.eq(activeIndex + 1).find('span').css('color', 'rgba(51,51,51,1)')
+                        }
                     }
                     //导航居中
                     navActiveSlideLeft = navSwiper.slides[activeIndex].offsetLeft //activeSlide距左边的距离
@@ -90,88 +109,47 @@ export default {
                     }
 
                 },
+                slideChangeTransitionEnd: function () {
+
+                    callback && callback(this.activeIndex)
+                }
             }
         });
+
+        // export pageSwiper
+        // pageSwiper.slideTo(slideTo.index, slideTo.speed, false)
         navSwiper.$el.on('touchstart', function (e) {
             e.preventDefault() //去掉按压阴影
         })
         navSwiper.on('tap', function (e) {
-
             clickIndex = this.clickedIndex
             clickSlide = this.slides.eq(clickIndex)
-            pageSwiper.slideTo(clickIndex, 0);
+            pageSwiper.slideTo(clickIndex, 300);
             this.slides.find('span').css('color', 'rgba(51,51,51,1)');
-            clickSlide.find('span').css('color', 'rgba(255,72,145,1)');
+            clickSlide.find('span').css('color', 'rgb(255,21,76)');
+            // that.sli(this, 300, pageSwiper.previousIndex)
         })
         //内容滚动
-        var scrollSwiper = new Swiper('.scroll', {
-            //65是头部的高
-            //36是top地址和搜索的高
-            slidesOffsetBefore: 72,
-            direction: 'vertical',
-            freeMode: true,
-            slidesPerView: 'auto',
-            mousewheel: {
-                releaseOnEdges: true,
-            },
-            on: {
-                touchMove: function () {
-                    if (this.translate > 72 - 36 && this.translate < 72) {
-                        topBar.transform('translateY(' + (this.translate - 72) + 'px)');
-                    }
-                },
-                touchStart: function () {
-                    startPosition = this.translate
-                },
-                touchEnd: function () {
-                    topBar.transition(tSpeed)
-                    if (this.translate > 36 && this.translate < 72 && this.translate < startPosition) {
-                        topBar.transform('translateY(-36px)');
-                        for (sc = 0; sc < scrollSwiper.length; sc++) {
-                            if (scrollSwiper[sc].translate > 36) {
-                                scrollSwiper[sc].setTransition(tSpeed);
-                                scrollSwiper[sc].setTranslate(36)
-                            }
-                        }
-                    }
-                    if (this.translate > 36 && this.translate < 72 && this.translate > startPosition) {
-                        topBar.transform('translateY(0px)');
-                        for (sc = 0; sc < scrollSwiper.length; sc++) {
-                            if (scrollSwiper[sc].translate < 72 && scrollSwiper[sc].translate > 0) {
-                                scrollSwiper[sc].setTransition(tSpeed);
-                                scrollSwiper[sc].setTranslate(72)
-                            }
-                        }
-                    }
-                },
-                transitionStart: function () {
-                    topBar.transition(tSpeed)
-                    if (this.translate < 72 - 36) {
-                        topBar.transform('translateY(-36px)');
-                        if (scrollSwiper) {
-                            for (let sc = 0; sc < scrollSwiper.length; sc++) {
-                                if (scrollSwiper[sc].translate > 36) {
-                                    scrollSwiper[sc].setTransition(tSpeed);
-                                    scrollSwiper[sc].setTranslate(36)
-                                }
-                            }
-                        }
+        that.swipers.navSwiper = navSwiper
+        that.swipers.pageSwiper = pageSwiper
 
-                    } else {
-                        topBar.transform('translateY(0px)');
-
-                        if (scrollSwiper) {
-                            for (let sc = 0; sc < scrollSwiper.length; sc++) {
-                                if (scrollSwiper[sc].translate < 72 && scrollSwiper[sc].translate > 0) {
-                                    scrollSwiper[sc].setTransition(tSpeed);
-                                    scrollSwiper[sc].setTranslate(72)
-                                }
-                            }
-                        }
-                    }
-                },
-            }
-
+    },
+    sli(nav, speed, call) {
+        this.swipers.pageSwiper.slideTo(0, speed);
+        let lastindex = this.swipers.pageSwiper.previousIndex
+        $('#top .swiper-slide span:eq(' + lastindex + ')').css({
+            'color': 'rgba(51,51,51,1)',
+            'transition': 'none'
         })
+        $('#top .swiper-slide span:eq(0)').css({'color': 'rgb(255,40,78)'})
+        let clickSlide = nav.slides.eq(0)
+        call && call()
+    },
+    transpeed(speed) {
+        if (!speed) {
+            return 300
+        }
+        return speed
     }
+
 }

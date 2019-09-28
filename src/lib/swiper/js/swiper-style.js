@@ -56,7 +56,7 @@ var pageSwiper = new Swiper('#page', {
                     let r = Math.floor((255 - 51) * (1 - Math.pow(Math.abs(slideProgress), 2)) + 51)
                     let g = Math.floor((72 - 51) * (1 - Math.pow(Math.abs(slideProgress), 2)) + 51)
                     let b = Math.floor((145 - 51) * (1 - Math.pow(Math.abs(slideProgress), 2)) + 51)
-                    navSwiper.slides.eq(i).find('span').css('color', 'rgba(' + r + ',' + g + ',' + b + ',1)')
+                    navSwiper.slides.eq(i).find('span').css('color', 'rgba(' + r + ',' + g + ',' + b + ',1)')  /*  color: rgb(255, 42, 95); */
                 }
             }
         },
@@ -68,7 +68,7 @@ var pageSwiper = new Swiper('#page', {
             bar.transform('translateX(' + activeSlidePosition + 'px)')
             //释放时文字变色过渡
             navSwiper.slides.eq(activeIndex).find('span').transition(tSpeed)
-            navSwiper.slides.eq(activeIndex).find('span').css('color', 'rgba(255,72,145,1)')
+            navSwiper.slides.eq(activeIndex).find('span').css('color', 'rgb(255,25,71)')
             if (activeIndex > 0) {
                 navSwiper.slides.eq(activeIndex - 1).find('span').transition(tSpeed)
                 navSwiper.slides.eq(activeIndex - 1).find('span').css('color', 'rgba(51,51,51,1)')
@@ -101,7 +101,7 @@ navSwiper.on('tap', function (e) {
     clickSlide = this.slides.eq(clickIndex)
     pageSwiper.slideTo(clickIndex, 0);
     this.slides.find('span').css('color', 'rgba(51,51,51,1)');
-    clickSlide.find('span').css('color', 'rgba(255,72,145,1)');
+    clickSlide.find('span').css('color', 'rgb(255,42,71)');
 })
 //内容滚动
 var scrollSwiper = new Swiper('.scroll', {

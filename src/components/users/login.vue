@@ -2,10 +2,7 @@
     <div class="login-root">
         <div class="login-list-container">
             <van-button round size="large" style="color: #f00;" @click="tologin">手机号登录</van-button>
-            <!--
-            v-if="$store.getters.getLoginInfo==null||''"
-            -->
-            <van-button round size="large"
+            <van-button round size="large" @click="Enter"
                         style="background: transparent;border: 0.5px solid #ffffff;margin-top: 20px;color: #fff;">立即体验
             </van-button>
         </div>
@@ -43,8 +40,10 @@
 </template>
 <script>
     import {Toast} from 'vant'
+    import Asynchronous from '@/api/asyc/asyc.js'
 
     export default {
+        name: 'login',
         data() {
             return {
                 submitflag: false,
@@ -113,23 +112,29 @@
                     this.$refs.tel.focus()
                 }
             },
+            Enter() {
+                this.$router.push({path: '/'})
+            },
             getLogin() {
-                let that = this
-                $.ajax({
+                Asynchronous({
                     type: 'get',
-                    url: `http://127.0.0.1:3000/login/cellphone?phone=${that.usernametrim}&password=${that.password}`,
-                    xhrFields: {withCredentials: true}
-                    //&timestamp=1503019930000
+                    url: '/login/cellphone',
+                    params: {
+                        phone: this.usernametrim,
+                        password: this.password
+                    }
                 }).then((ret) => {
-                    console.log(ret)
                     if (ret.code == 200) {
                         this.$store.commit('saveLoginInfo', ret)
-                        //  this.$router.push({path: '/'})
+                        Toast({
+                            message: '登录成功',
+                            duration: 2000
+                        })
+                        this.$router.back()
                     }
                 }).catch((err) => {
                     this.suberrret = err
                     this.tipsflag = true
-                    console.log(err)
                 })
             }
         },
@@ -142,7 +147,6 @@
         activated() {
             this.getFocus()
         }
-
     }
 </script>
 <style scoped lang="less">
@@ -154,7 +158,6 @@
         width: 100%;
         height: 200px;
         display: flex;
-        /*justify-content: space-around;*/
         flex-direction: column;
         align-items: center;
 
@@ -165,6 +168,10 @@
             line-height: 40px;
             font-size: 14px;
             letter-spacing: 2px;
+
+            button {
+
+            }
         }
     }
 
@@ -175,6 +182,7 @@
         height: 100%;
         width: 100%;
         background-color: #ce1b2a;
+        z-index: 999;
     }
 
     .tologin-container {
@@ -276,12 +284,3 @@
         }
     }
 </style>
-
-<!--
-
-/* this.axios.get(`/login/cellphone?phone=${that.usernametrim}&password=${that.password}`).then((ret) => {
-                      console.log(ret)
-                  }).catch((err) => {
-                      console.log(err)
-                  })*/
-                  -->
