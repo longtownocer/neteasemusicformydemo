@@ -14,7 +14,7 @@
 
 #### 技术栈
 
-[ VantUI](https://youzan.github.io/vant/#/zh-CN/intro): Vant -  轻量 、可靠的移动端 Vue 组件库,轻量级的移动应用框架,提供了许多日常需要的业务需求的代码片段
+[ VantUI](https://youzan.github.io/vant/#/zh-CN/intro): Vant  -  轻量 、可靠的移动端 Vue 组件库,轻量级的移动应用框架,提供了许多日常需要的业务需求的代码片段
 
  **Vue2**：采用最新Vue2的语法，最新的Vue框架版本。
 
