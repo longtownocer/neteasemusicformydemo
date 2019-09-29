@@ -163,9 +163,6 @@
                 }
                 this.scrollTo(n)
             },
-            '$store.state.songinfo.audiosrc': function (n, l) {
-
-            },
             '$store.state.currentindex': function (n, l) {
                 if (n > 6) {
                     $('.van-action-sheet').scrollTop((n - 3) * 40)
