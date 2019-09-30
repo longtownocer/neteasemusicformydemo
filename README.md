@@ -39,14 +39,14 @@
 
 ****
 
- 源代码地址：[GitHub](https://github.com/2902854803/neteasemusicformydemo) 欢迎您的star和watching
+​        源代码地址：[GitHub](https://github.com/2902854803/neteasemusicformydemo) 欢迎您的star和watching
 
 
 
 ##### 在线预览：
 
 
-       [观看视频](http://47.106.129.158:2000/)
+​        [观看视频](http://47.106.129.158:2000/)
 
 ######         已部署到服务器
 
