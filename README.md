@@ -39,7 +39,7 @@
 
 ####视频预览演示 
 
-<video controls style="height:450px;" src="http://raw.githubusercontent.com/2902854803/Demovideo/master/Screenrecorder-2019-09-28-14-57-28-624~4.mp4"></video>
+
 
 
 
@@ -54,6 +54,7 @@
 
 
 ##### 在线预览：
+<video controls style="height:450px;" src="http://raw.githubusercontent.com/2902854803/Demovideo/master/Screenrecorder-2019-09-28-14-57-28-624~4.mp4"></video>
 
 ######         已部署到服务器
 
