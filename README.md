@@ -56,11 +56,11 @@
 ##### 在线预览：
 
 
-[Watch the video](http://raw.githubusercontent.com/2902854803/Demovideo/master/Screenrecorder-2019-09-28-14-57-28-624~4.mp4)
+   [观看视频](http://raw.githubusercontent.com/2902854803/Demovideo/master/Screenrecorder-2019-09-28-14-57-28-624~4.mp4)
 
 ######         已部署到服务器
 
-​        在线预览地址： [网易云音乐播放器](http://47.106.129.158/)
+​   在线查看地址： [网易云音乐播放器](http://47.106.129.158/)
 
 ​      
 
