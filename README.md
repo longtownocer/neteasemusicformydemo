@@ -37,16 +37,6 @@
 
 **Swiper**：是纯 javascript 打造的滑动特效插件，面向手机、平板电脑等移动终端，能实现触屏焦点图、触屏Tab切换、触屏多图切换等常用效果，开源、免费、稳定、使用简单、功能强大，是架构移动终端网站的重要选择！
 
-####视频预览演示 
-
-
-
-
-
-
-
-####源代码
-
 ****
 
  源代码地址：[GitHub](https://github.com/2902854803/neteasemusicformydemo) 欢迎您的star和watching
@@ -56,7 +46,7 @@
 ##### 在线预览：
 
 
-[Watch the video](http://raw.githubusercontent.com/2902854803/Demovideo/master/Screenrecorder-2019-09-28-14-57-28-624~4.mp4)
+[观看视频](http://47.106.129.158:2000/)
 
 ######         已部署到服务器
 
