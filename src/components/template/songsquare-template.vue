@@ -135,7 +135,6 @@
                 //加载更多
                 this.offsets[id] += 1
                 //数据请求
-
                 Asynchronous({
                     type: 'get',
                     url: '/top/playlist',

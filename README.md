@@ -1,4 +1,4 @@
-# 网易云音乐NodeJs版播放器精简版
+#网易云音乐NodeJs版播放器精简版
 
 ****
 
@@ -14,7 +14,7 @@
 
 #### 技术栈
 
-[ VantUI](https://youzan.github.io/vant/#/zh-CN/intro): Vant  -  轻量 、可靠的移动端 Vue 组件库,轻量级的移动应用框架,提供了许多日常需要的业务需求的代码片段
+[ VantUI](https://youzan.github.io/vant/#/zh-CN/intro): Vant - 轻量、可靠的移动端 Vue 组件库,轻量级的移动应用框架,提供了许多日常需要的业务需求的代码片段
 
  **Vue2**：采用最新Vue2的语法，最新的Vue框架版本。
 
@@ -35,7 +35,7 @@
 **vuex-persistedstate**：实现Vuex状态管理仓储的永久性储存
 **CSS3**：CSS3动画及样式。
 
-**[Swiper](https://www.swiper.com.cn/):**是纯 javascript 打造的滑动特效插件，面向手机、平板电脑等移动终端，能实现触屏焦点图、触屏Tab切换、触屏多图切换等常用效果，开源、免费、稳定、使用简单、功能强大，是架构移动终端网站的重要选择！
+[Swiper](https://www.swiper.com.cn/):是纯 javascript 打造的滑动特效插件，面向手机、平板电脑等移动终端，能实现触屏焦点图、触屏Tab切换、触屏多图切换等常用效果，开源、免费、稳定、使用简单、功能强大，是架构移动终端网站的重要选择！
 
 ####视频预览演示 
 
