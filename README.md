@@ -56,7 +56,7 @@
 ##### 在线预览：
 
 
-   [观看视频](http://raw.githubusercontent.com/2902854803/Demovideo/master/Screenrecorder-2019-09-28-14-57-28-624~4.mp4)
+   [观看视频](http://47.106.129.158:2000/)
 
 ######         已部署到服务器
 
