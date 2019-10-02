@@ -324,6 +324,7 @@
                 }
                 this.removecurrent()
                 this.clearLyric()
+                this.resetLyricposition()
                 if (this.$store.state.mode == 'order') {
                     let ntindex = this.$store.state.currentindex - 1
                     if (ntindex < 0) {
@@ -344,7 +345,6 @@
                     this.$refs.audio.currentTime = 0
                     this.seek(0)
                     this.value = 0
-                    this.resetLyricposition()
                     this.$refs.audio.play()
                     this.setlyric(this.$store.state.currentLyric)
                 }
@@ -356,6 +356,7 @@
                 }
                 this.removecurrent()
                 this.clearLyric()
+                this.resetLyricposition()
                 if (this.$store.state.mode == 'order') {
                     let ntindex = this.$store.state.currentindex + 1
                     if (ntindex >= this.$store.state.songslist.length) {
@@ -376,7 +377,6 @@
                     this.$refs.audio.currentTime = 0
                     this.seek(0)
                     this.value = 0
-                    this.resetLyricposition()
                     this.$refs.audio.play()
                     this.setlyric(this.$store.state.currentLyric)
                 }
