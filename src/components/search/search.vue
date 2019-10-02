@@ -1,5 +1,4 @@
 <template>
-    <transition name="search">
         <div class="search-root">
             <div class="top">
                 <div class="back" @click="hide">
@@ -344,7 +343,6 @@
                 </div>
             </div>
         </div>
-    </transition>
 </template>
 <script>
     import SliderBound from '@/js/slider-rebound/slider-bound'
