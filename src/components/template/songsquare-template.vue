@@ -40,7 +40,7 @@
                         </div>
                     </div>
                     <div class="load"
-                         :class="[{'top':initialdata[index].length==0},{'bottom':initialdata[index].length!==0},{'nomore':loadstatus[index].nomore}]">
+                         :class="[(initialdata[index].length==0)?'top':'bottom',{'nomore':loadstatus[index].nomore}]">
                         <van-loading color="#ff3f46"/>
                     </div>
                     <div class="noreminfo" v-if="loadstatus[index].nomore">
@@ -154,7 +154,7 @@
                             picUrl: item.coverImgUrl
                         })
                     })
-                    this.initialdata[id] = this.initialdata[id].concat(poparr)
+                    this.initialdata[id].push(...poparr)
                     //添加数据后回调
                     callback && callback()
                     this.$forceUpdate()

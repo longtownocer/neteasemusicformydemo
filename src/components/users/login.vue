@@ -40,6 +40,7 @@
 </template>
 <script>
     import {Toast} from 'vant'
+    import {mapMutations} from 'vuex'
     import Asynchronous from '@/api/asyc/asyc.js'
 
     export default {
@@ -56,6 +57,7 @@
             }
         },
         methods: {
+            ...mapMutations(['saveLoginInfo']),
             tologin() {
                 this.submitflag = true
             },
@@ -125,7 +127,7 @@
                     }
                 }).then((ret) => {
                     if (ret.code == 200) {
-                        this.$store.commit('saveLoginInfo', ret)
+                        this.saveLoginInfo(ret)
                         Toast({
                             message: '登录成功',
                             duration: 2000

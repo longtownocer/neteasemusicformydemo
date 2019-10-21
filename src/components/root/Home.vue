@@ -23,7 +23,7 @@
                         <div class="carsouel-top">
                             <div class="swiper-container" id=carsouel-top>
                                 <div class="swiper-wrapper">
-                                    <div class="swiper-slide" v-for="(item,i) in swipercarsouel">
+                                    <div class="swiper-slide" v-for="(item,i) in swipercarsouel" ref="glx">
                                         <a :href="item.url">
                                             <img :src="item.pic"
                                                  alt="">
@@ -82,19 +82,6 @@
                                 </router-link>
                             </div>
                         </div>
-                        <!--新碟专辑-->
-                        <!-- <div class="album">
-                             <div class="album-title">
-                                 <span>新碟</span><b>|</b><span>新歌</span>
-                             </div>
-                             <div class="album-list">
-                                 <div class="each-album-list" v-for="(item,i) in 3">
-                                     <div class="current-album-list-title">
-                                         梅梅新专辑
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>-->
                     </div>
 
                     <div class="swiper-slide index">
@@ -116,18 +103,18 @@
     import Swiper from 'swiper'
     import Asynchronous from '@/api/asyc/asyc.js'
     import search from '@/components/search/search'
+
     export default {
         name: 'home',
         data() {
             return {
-                sliderflag: this.$route.path == '/1',
-                baseUrl: this.$store.state.baseUrl,
                 songslistdetails: [],
                 swipercarsouel: [],
                 homechannel: ['我的', '发现', '视频', '更多'],
                 homesliderobj: {},
                 isLoading: false,
-                SlidePosition: []
+                SlidePosition: [],
+                Slideswiper: null
             }
         },
         methods: {
@@ -143,7 +130,7 @@
                     this.songslistdetails = ret.result
                 })
             },
-            getSwipercarsouel() {
+            getSwipercarsouel(call) {
                 Asynchronous({
                     type: 'get',
                     url: '/banner',
@@ -153,6 +140,7 @@
                     }
                 }).then((ret) => {
                     this.swipercarsouel = ret.banners
+                    call && call()
                 })
             },
             onRefresh() {
@@ -175,19 +163,18 @@
                 this.$parent.playsong(i, id)
             },
             SlideSwiper() {
-                if ($('#carsouel-top .swiper-slide').length == 9) {
-                    new Swiper('#carsouel-top', {
-                        autoplay: true,
-                        speed: 300,
-                        loop: true,
-                        scrollbar: {
-                            el: '.swiper-wrapper'
-                        },
-                        pagination: {
-                            el: '#carsouel-pagination'
-                        },
-                    })
-                }
+
+                let c = new Swiper('#carsouel-top', {
+                    autoplay: true,
+                    speed: 300,
+                    loop: true,
+                    init: false,
+                    pagination: {
+                        el: '#carsouel-pagination'
+                    },
+                })
+                console.log('调用了')
+
             },
             SlideChannel() {
                 this.homesliderobj = new Swiper('#homeInfo', {
@@ -203,16 +190,28 @@
         },
         created() {
             this.getSonglistdetails()
-            this.getSwipercarsouel()
+            this.getSwipercarsouel(() => {
+                this.$nextTick(() => {
+                    new Swiper('#carsouel-top', {
+                        autoplay: true,
+                        speed: 300,
+                        loop: true,
+                        pagination: {
+                            el: '#carsouel-pagination'
+                        },
+                    })
+                })
+            })
             this.$store.state.search = false
         },
         mounted() {
             this.SlideChannel()
         },
         updated() {
-            this.SlideSwiper()
+
         },
         beforeRouteLeave(to, from, next) {
+
             this.SlidePosition = []
             $('.index').each((index, item) => {
                 this.SlidePosition.push({scrolltop: item.scrollTop})

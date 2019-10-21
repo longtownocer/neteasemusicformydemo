@@ -107,6 +107,7 @@
     import Asynchronous from '@/api/asyc/asyc.js'
     import load from '@/components/load/loaddata'
     import search from '@/components/search/searchrecommedresult'
+    import {mapActions} from 'vuex'
 
     export default {
         data() {
@@ -128,6 +129,7 @@
             }
         },
         methods: {
+            ...mapActions(['updatesongLIst']),
             getrecommend(id) {
                 return Asynchronous({
                     type: 'get',
@@ -139,12 +141,13 @@
             },
             play(i, id) {
                 if (this.switchlist || this.$store.state.songslist.length < this.songslist.length) {  //第一次播放
-                    this.$store.dispatch('updatesongLIst', this.DeepCopy(this.songslist)) //深拷贝
+                    this.updatesongLIst(this.DeepCopy(this.songslist)) //深拷贝
                     this.switchlist = false
                 }
                 this.$parent.clearLyric()
-                this.$parent.playsong(i, id)
                 this.$parent.removecurrent()
+                this.$parent.resetHeight()
+                this.$parent.playsong(i, id)
             },
             goback() {
                 this.$router.back()

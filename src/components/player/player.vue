@@ -24,7 +24,7 @@
                 <div class="top">
                     <div class="left">
                         <van-icon name="exchange"></van-icon>
-                        列表循环({{list.length}})
+                        列表循环({{this.list.length}})
                     </div>
                     <div class="right">
                         <van-icon name="add-o"></van-icon>
@@ -78,7 +78,7 @@
                             <img :src="songinfo.pictrue_url" alt="">
                         </div>
                     </div>
-                    <div class="center-songlrc" :class="{'zeroheight':inturn}">
+                    <div class="center-songlrc" v-show="!inturn">
                         <div class="blurtop"></div>
                         <div class="lyric" ref="lyricList">
                             <ul class="con-p" ref="lyricLine" v-if="currentLyric">
@@ -114,7 +114,7 @@
                             {{duration|formatsongtime($store.state.currentduration)}}
                         </div>
                     </div>
-                    <div class="switchando-peratingsongs"><!--iconliebiaoshunxu-->
+                    <div class="switchando-peratingsongs">
                         <i class="iconfont"
                            :class="[{'iconliebiaoshunxu':($store.state.mode=='order')},{'iconsuiji':$store.state.mode=='random'},{'icondanquxunhuan':$store.state.mode=='loop'}]"
                            @click="switchmode($event)"></i>
@@ -135,6 +135,7 @@
     import Swiper from 'swiper'
     import Asynchronous from '@/api/asyc/asyc'
     import SliderBound from '@/js/slider-rebound/slider-bound'
+    import {mapState, mapGetters, mapMutations, mapActions} from 'vuex'
 
     export default {
         data() {
@@ -163,13 +164,18 @@
                 }
                 this.scrollTo(n)
             },
-            '$store.state.currentindex': function (n, l) {
+            'currentindex': function (n, l) {
                 if (n > 6) {
                     $('.van-action-sheet').scrollTop((n - 3) * 40)
                 }
             },
             'duration': function (n, l) {
-                this.$store.dispatch('updatecurrentduration', n)
+                if (!isNaN(n)) {
+                    this.$store.dispatch('updatecurrentduration', n)
+                }
+            },
+            'currentid': function (n, l) {
+                this.updateLyric()
             },
             'show': function (n, l) {
                 if (!n) {
@@ -178,6 +184,17 @@
             }
         },
         methods: {
+            ...mapActions([
+                'updateSongsInfo',
+                'updatacurrentLyric',
+                'updatecurrentindex',
+                'updatecurrentid',
+                'updatecurrentindex'
+            ]),
+            ...mapMutations([
+                'setPlayMode',
+                'RemoveSongsList'
+            ]),
             setLyricShow(n) {
                 this.scrollTo(n)
             },
@@ -252,8 +269,8 @@
             switchsong(newinfo, lyric) {
                 this.playflag = true
                 this.$refs.audio.pause()
-                this.$store.dispatch('updateSongsInfo', newinfo)
-                this.$store.dispatch('updatacurrentLyric', lyric)
+                this.updateSongsInfo(newinfo)
+                this.updatacurrentLyric(lyric)
                 this.songinfo = newinfo
                 this.$refs.audio.load()
                 this.$refs.audio.play()
@@ -274,7 +291,9 @@
             },
             imgtolrc() {
                 this.inturn = !this.inturn
-                this.setLyricShow(this.currentLineNum)
+                this.$nextTick(() => {
+                    this.setLyricShow(this.currentLineNum)
+                })
             },
             handleLyric({lineNum, txt}) {
                 this.currentLineNum = lineNum
@@ -283,35 +302,34 @@
                 this.showplay = false
             },
             switchmode(e) {
-                if (this.$store.state.mode == 'order') {
-                    this.$store.commit('setPlayMode', 'random')
-                } else if (this.$store.state.mode == 'random') {
-                    this.$store.commit('setPlayMode', 'loop')
-                } else if (this.$store.state.mode == 'loop') {
-                    this.$store.commit('setPlayMode', 'order')
+                if (this.mode == 'order') {
+                    this.setPlayMode('random')
+                } else if (this.mode == 'random') {
+                    this.setPlayMode('loop')
+                } else if (this.mode == 'loop') {
+                    this.setPlayMode('order')
                 }
             },
             showlist() {
                 this.show = true
             },
             removelist(i) {
-                this.$store.commit('RemoveSongsList', i)
-                if (this.$store.state.songslist.length == 0) {
-                    return this.$store.dispatch('updatecurrentindex', null)
+                this.RemoveSongsList(i)
+                if (this.songslist.length == 0) {
+                    return this.updatecurrentindex(null)
                 }
-                let index = this.$store.state.currentindex
-                if (i < index) {
-                    this.$store.dispatch('updatecurrentindex', index - 1)
-                } else if (i == index) {
-                    if (this.$store.state.songslist.length == 0) {
-                        this.$store.dispatch('updatecurrentindex', null)
-                    } else if (i == this.$store.state.songslist.length) {
+                if (i < this.currentindex) {
+                    this.updatecurrentindex(this.currentindex - 1)
+                } else if (i == this.currentindex) {
+                    if (this.songslist.length == 0) {
+                        this.updatecurrentindex(null)
+                    } else if (i == this.songslist.length) {
                         //判断是否时最后一列
-                        this.$store.dispatch('updatecurrentindex', i - 1)
-                        this.playsong(i - 1, this.$store.state.songslist[i - 1].id)
-                    } else if (i < this.$store.state.songslist.length) {
+                        this.updatecurrentindex(i - 1)
+                        this.playsong(i - 1, this.songslist[i - 1].id)
+                    } else if (i < this.songslist.length) {
                         //如果小于最后一列  调用后一列
-                        this.playsong(i, this.$store.state.songslist[i].id)
+                        this.playsong(i, this.songslist[i].id)
                     }
                 }
             },
@@ -319,64 +337,66 @@
                 this.playsong(i, id)
             },
             prev() {
-                if (this.$store.state.songslist.length == 0) {
+                if (this.songslist.length == 0) {
                     return window.confirm('歌曲列表为空')
                 }
                 this.removecurrent()
                 this.clearLyric()
-                if (this.$store.state.mode == 'order') {
-                    let ntindex = this.$store.state.currentindex - 1
+                this.resetLyricposition()
+                if (this.mode == 'order') {
+                    let ntindex = this.currentindex - 1
                     if (ntindex < 0) {
-                        ntindex = this.$store.state.songslist.length - 1
+                        ntindex = this.songslist.length - 1
                     }
-                    this.playsong(ntindex, this.$store.state.songslist[ntindex].id)
-                } else if (this.$store.state.mode == 'random') {
-                    let randomlg = this.$store.state.songslist.length
+                    this.playsong(ntindex, this.songslist[ntindex].id)
+                } else if (this.mode == 'random') {
+                    let randomlg = this.songslist.length
                     let randomnum = parseInt(Math.random() * randomlg)
-                    if (randomnum == this.$store.state.currentindex) {
+                    if (randomnum == this.currentindex) {
                         randomnum += parseInt(Math.random() * 4)
                         if (randomnum >= randomlg) {
                             randomnum = randomnum % randomlg
                         }
                     }
-                    this.playsong(randomnum, this.$store.state.songslist[randomnum].id)
-                } else if (this.$store.state.mode == 'loop') {
+                    this.playsong(randomnum, this.songslist[randomnum].id)
+                } else if (this.mode == 'loop') {
                     this.$refs.audio.currentTime = 0
                     this.seek(0)
                     this.value = 0
-                    this.resetLyricposition()
+                    this.playflag = true
                     this.$refs.audio.play()
                     this.setlyric(this.$store.state.currentLyric)
                 }
 
             },
             next() {
-                if (this.$store.state.songslist.length == 0) {
+                if (this.songslist.length == 0) {
                     return window.confirm('歌曲列表为空')
                 }
                 this.removecurrent()
                 this.clearLyric()
-                if (this.$store.state.mode == 'order') {
-                    let ntindex = this.$store.state.currentindex + 1
-                    if (ntindex >= this.$store.state.songslist.length) {
+                this.resetLyricposition()
+                if (this.mode == 'order') {
+                    let ntindex = this.currentindex + 1
+                    if (ntindex >= this.songslist.length) {
                         ntindex = 0
                     }
-                    this.playsong(ntindex, this.$store.state.songslist[ntindex].id)
-                } else if (this.$store.state.mode == 'random') {
-                    let randomlg = this.$store.state.songslist.length
+                    this.playsong(ntindex, this.songslist[ntindex].id)
+                } else if (this.mode == 'random') {
+                    let randomlg = this.songslist.length
                     let randomnum = parseInt(Math.random() * randomlg)
-                    if (randomnum == this.$store.state.currentindex) {
+                    if (randomnum == this.currentindex) {
                         randomnum += parseInt(Math.random() * 4)
                         if (randomnum >= randomlg) {
                             randomnum = randomnum % randomlg
                         }
                     }
-                    this.playsong(randomnum, this.$store.state.songslist[randomnum].id)
-                } else if (this.$store.state.mode == 'loop') {
+                    this.playsong(randomnum, this.songslist[randomnum].id)
+                } else if (this.mode == 'loop') {
                     this.$refs.audio.currentTime = 0
                     this.seek(0)
                     this.value = 0
-                    this.resetLyricposition()
+                    this.playflag = true
                     this.$refs.audio.play()
                     this.setlyric(this.$store.state.currentLyric)
                 }
@@ -385,8 +405,8 @@
                 this.next()
             },
             playsong(i, id) {
-                this.$store.dispatch('updatecurrentid', id)
-                this.$store.dispatch('updatecurrentindex', i)
+                this.updatecurrentid(id)
+                this.updatecurrentindex(i)
                 //获取歌词
                 let newsinfo = {}
                 let lyric = ''
@@ -394,7 +414,7 @@
                     type: 'get',
                     url: '/lyric',
                     params: {
-                        id: this.$store.state.songslist[i].id
+                        id: this.songslist[i].id
                     }
                 }).then((ret) => {
                     if (ret.lrc) {
@@ -406,7 +426,7 @@
                         type: 'get',
                         url: '/check/music',
                         params: {
-                            id: this.$store.state.songslist[i].id,
+                            id: this.songslist[i].id,
                         },
                     })
                 }).then((ret) => {
@@ -414,10 +434,10 @@
                         this.next()
                     }
                     newsinfo = {
-                        name: this.$store.state.songslist[i].name,
-                        artist: this.$store.state.songslist[i].artist,
-                        audiosrc: 'https://music.163.com/song/media/outer/url?id=' + this.$store.state.songslist[i].id + '.mp3',
-                        pictrue_url: this.$store.state.songslist[i].picUrl
+                        name: this.songslist[i].name,
+                        artist: this.songslist[i].artist,
+                        audiosrc: 'https://music.163.com/song/media/outer/url?id=' + this.songslist[i].id + '.mp3',
+                        pictrue_url: this.songslist[i].picUrl
                     }
                     this.switchsong(newsinfo, lyric)
                 }, ((err) => {
@@ -437,19 +457,17 @@
             transstart(e) {
                 if (this.show && this.dragrecover) {
                     this.dragrecover = false
-                    $('.list').scrollTop((this.$store.state.currentindex - 4) * 40)
+                    $('.list').scrollTop((this.currentindex - 4) * 40)
                 }
             },
             updateLyric() {
-                if (this.currentLyric) {
-                    SliderBound('.con-p', {
-                        touchmove(el, event, defit) {
-                            if (defit.Lateraldeficit <= 40) {
-                                event.stopPropagation();
-                            }
+                SliderBound('.con-p', {
+                    touchmove(el, event, defit) {
+                        if (defit.Lateraldeficit <= 55) {
+                            event.stopPropagation();
                         }
-                    })
-                }
+                    }
+                })
             },
             resetLyricposition() {
                 $('.lyric').scrollTop(0)
@@ -520,7 +538,7 @@
                         }
                     }
                 })
-            }
+            },
         },
         created() {
             this.songinfo = this.$store.state.songinfo
@@ -535,14 +553,10 @@
                 this.playflag = false
             }
             this.totaltime = this.$refs.audio.duration
-            let that = this
             this.RotateHide(this)
             this.updateLyric()
             this.bottomboxSlide(this)
             this.listSlide()
-        },
-        updated() {
-
         },
         computed: {
             setplayicon() {
@@ -551,13 +565,8 @@
                 }
                 return 'play-circle-o'
             },
-            lightrow() {
-                // return this.$refs.audio.currentTime*1000==this.txt
-            },
-            list() {
-                return this.$store.getters.getsongslist
-            }
-
+            ...mapGetters({list: 'getsongslist'}),
+            ...mapState(['currentindex', 'currentid', 'mode', 'songslist']),
         },
         filters: {},
         components: {},
@@ -571,6 +580,8 @@
     }
 </script>
 <style scoped lang="less">
+
+
     @media screen and(max-height: 420px) {
         #player {
             display: none;
@@ -585,9 +596,6 @@
 
     }
 
-    .zeroheight {
-        height: 0 !important;
-    }
 
     .boxcontainer-enter, .boxcontainer-leave-to {
         transform: translateY(100%);
@@ -617,12 +625,25 @@
 
     .bottombox-background {
         position: fixed;
-        width: 100%;
-        height: 100%;
+        .hole();
         z-index: 1000;
         background-color: rgba(0, 0, 0, .6)
     }
 
+    .hole {
+        width: 100%;
+        height: 100%;
+    }
+
+    .flexcenter {
+        display: flex;
+        align-items: center;
+    }
+
+    .flexbetween {
+        display: flex;
+        justify-content: space-between;
+    }
 
     #player .songs-eachlist-current:hover {
         background-color: #ff4060;
@@ -673,22 +694,19 @@
     }
 
     .top {
+        .flexbetween();
         position: fixed;
         width: 100%;
         height: 50px;
         line-height: 50px;
         background-color: #fff;
-        display: flex;
-        justify-content: space-between;
         border-radius: 15px 15px 0 0;
         border-bottom: 1px solid rgba(191, 191, 191, 0.27);
         z-index: 999;
 
         .left {
             margin-left: 10px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            .flexcenter();
 
             i {
                 font-size: 20px;
@@ -697,9 +715,7 @@
         }
 
         .right {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            .flexcenter();
             margin-right: 15px;
 
             i {
@@ -724,24 +740,13 @@
         overflow: scroll;
 
         .eachlist {
+            .flexcenter();
+            .flexbetween();
             height: 40px;
             text-align: left;
-            display: flex;
-            justify-content: space-between;
-            flex-direction: row;
-            align-items: center;
 
             .play {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-
-                .name {
-                    //   overflow: hidden;
-                    //   text-overflow: ellipsis;
-                    //   white-space: nowrap;
-                    //   width: 300px;
-                }
+                .flexcenter();
 
                 i {
                     margin-right: 5px;
@@ -751,8 +756,6 @@
                 b {
                     color: rgba(165, 162, 169, 0.71);
                 }
-
-
             }
 
             .remove {
@@ -775,24 +778,20 @@
         width: 100%;
         height: 60px;
         background-color: #ffffff;
-        display: flex;
-        justify-content: space-between;
+        .flexbetween();
         padding: 0 7px;
         border-top: 0.2px solid rgba(138, 138, 138, 0.42);
         z-index: 9;
 
         .song-avatar-info {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            .flexcenter();
 
             .avatar {
                 width: 40px;
                 height: 40px;
 
                 img {
-                    height: 100%;
-                    width: 100%;
+                    .hole();
                     border-radius: 50%;
                     min-width: 40px;
                 }
@@ -804,15 +803,12 @@
                 font-size: 12px;
                 height: 40px;
                 text-align: left;
-
             }
         }
 
         .songscontrols {
-            display: flex;
-            justify-content: space-between;
-            flex-direction: row;
-            align-items: center;
+            .flexcenter();
+            .flexbetween();
             margin-right: 20px;
             width: 20%;
 
@@ -830,7 +826,6 @@
 
 
             .stop-play {
-                /*text-align: center;*/
                 height: 27px;
                 position: relative;
                 width: 27px;
@@ -856,11 +851,9 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        .hole();
         background-color: rgb(66, 94, 175);
         transform-origin: 100% 400%;
-        /*transform: rotateZ(45deg);*/
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -872,31 +865,24 @@
 
         .filter {
             position: absolute;
+            .hole();
             top: 0;
             left: 0;
             filter: blur(15px) brightness(0.8);
             transform: scale(1.2);
-            width: 100%;
-            height: 100%;
-
-
         }
 
         .top-fixed {
-            display: flex;
-            justify-content: space-between;
+            .flexbetween();
             height: 50px;
             padding: 10px 10px;
 
             .left {
-                display: flex;
-                justify-content: space-between;
-                flex-direction: row;
-                align-items: center;
+                .flexbetween();
+                .flexcenter();
 
                 .songstitle {
-                    display: flex;
-                    justify-content: space-between;
+                    .flexbetween();
                     flex-direction: column;
                     margin-left: 5px;
 
@@ -913,7 +899,6 @@
                         -webkit-line-clamp: 2;
                         overflow: hidden;
                         -webkit-box-orient: vertical;
-
                     }
 
                     span:nth-of-type(2) {
@@ -943,12 +928,11 @@
 
         .center-info {
             overflow: hidden;
-            width: 100%;
-            height: 100%;
-            display: flex;
+            .hole();
+            .flexcenter();
             justify-content: space-around;
             flex-direction: column;
-            align-items: center;
+
 
             .center {
                 height: 100%;
@@ -960,18 +944,17 @@
             }
 
             .center-animate {
+                @roundlong: 260px;
                 position: relative;
                 transform: translateY(50%);
-                width: 260px;
-                height: 260px;
-                /*height: 100%;*/
+                width: @roundlong;
+                height: @roundlong;
                 box-sizing: border-box;
                 border: 10px solid #bfbcc3;
                 border-radius: 50%;
                 animation: songtravel 20s linear infinite;
                 margin: 0 auto;
                 overflow: hidden;
-
 
                 img {
                     height: 100%;
@@ -982,14 +965,12 @@
             }
 
             .center-songlrc {
-                width: 100%;
-                height: 100%;
+                .hole();
                 color: #eee;
                 position: relative;
 
                 .lyric {
-                    width: 103%;
-                    height: 100%;
+                    .hole();
                     overflow: scroll;
                     position: absolute;
                     left: 50%;
@@ -997,10 +978,12 @@
                 }
 
                 ul {
-                    padding-bottom: 170px;
+                    @bt: 170px;
+                    @max: 90%;
+                    padding-bottom: @bt;
                     display: inline-block;
                     max-width: 90%;
-                    min-width: 80%;
+                    min-width: @max - 10%;
                     position: relative;
                     top: 50%;
                 }
@@ -1020,20 +1003,16 @@
         }
 
         .bottom-info {
-            /*height: 140px;*/
             display: flex;
             flex-direction: column;
             bottom: 20px;
             left: 0;
             width: 100%;
 
-
             .operating {
                 height: 40px;
-                display: flex;
-                justify-content: space-between;
-                flex-direction: row;
-                align-items: center;
+                .flexcenter();
+                .flexbetween();
                 font-size: 22px;
                 color: #fff;
                 padding: 0 50px;
@@ -1045,12 +1024,9 @@
             }
 
             .slider-controls {
-
-
                 padding: 5px 53px;
                 width: 100%;
                 box-sizing: border-box;
-
 
                 .current-play-time {
                     float: left;
@@ -1072,9 +1048,8 @@
             }
 
             .switchando-peratingsongs {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
+                .flexcenter();
+                .flexbetween();
                 padding: 0 30px;
                 padding-bottom: 10px;
 

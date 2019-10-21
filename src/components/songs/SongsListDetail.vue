@@ -50,6 +50,7 @@
 <script>
     import load from '@/components/load/loaddata'
     import Asynchronous from '@/api/asyc/asyc'
+    import {mapActions, mapState} from 'vuex'
 
     export default {
         data() {
@@ -60,6 +61,7 @@
             }
         },
         methods: {
+            ...mapActions(['updatesongLIst']),
             getsongslistinfo() {
                 Asynchronous({
                     type: 'get',
@@ -93,7 +95,7 @@
                 })
             },
             playsong(i, id) {
-                if (this.songarr.length == 0 || this.$store.state.songslist.length < this.songslistInfo.length) {
+                if (this.songarr.length == 0 || this.songslist.length < this.songslistInfo.length) {
                     let arr = []
                     this.songslistInfo.forEach((item, i) => {
                         arr.push({
@@ -104,25 +106,29 @@
                             album: item.album.name
                         })
                     })
-                    this.$store.dispatch('updatesongLIst', this.deepCopy(arr))
+                    this.updatesongLIst(this.deepCopy(arr))
                     this.songarr.push('finished')
                 }
                 this.$parent.clearLyric()
-                this.$parent.playsong(i, id)
                 this.$parent.removecurrent()
+                this.$parent.resetHeight()
+                this.$parent.playsong(i, id)
             },
             deepCopy(obj) {
                 return JSON.parse(JSON.stringify(obj))
             }
         },
         created() {
-            if (!this.$store.state.logininfo) {
+            if (!this.logininfo) {
                 return this.$router.push({path: '/login'})
             }
             this.getsongslistinfo()
         },
         mounted() {
             this.scroll()
+        },
+        computed:{
+            ...mapState(['songslist','logininfo']),
         },
         components: {
             load

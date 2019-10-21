@@ -1,355 +1,354 @@
 <template>
-    <transition name="search">
-        <div class="search-root">
-            <div class="top">
-                <div class="back" @click="hide">
-                    <span class="iconfont icon-icon-return"></span>
-                </div>
-                <div class="searchbox">
-                    <input type="serch" v-model="keywords" ref="searchs" :placeholder="defaultkeyword"
-                           maxlength="20"
-                           @keypress="searchsongs($event)">
-                    <span class="iconfont iconguanbi" v-show="keywords.length!==0"
-                          @click="clearwords($refs.searchs)"></span>
-                </div>
-                <div class="singer">
-                    <span class="iconfont iconuser"></span>
-                </div>
+    <div class="search-root">
+        <div class="top">
+            <div class="back" @click="hide">
+                <span class="iconfont icon-icon-return"></span>
             </div>
-            <div class="recommendedlist" v-show="searchflag">
-                <div class="title">
-                    <b>热搜榜</b>
-                </div>
-                <div class="list" v-for="(item,i) in searchlist" :class="{'last':i==searchlist.length-1}"
-                     @click="keysearch(item.searchWord)">
-                    <div class="rank" :class="{'red':i<=2}">{{i+1}}</div>
-                    <div class="content">
-                        <div class="up">
-                            <b>{{item.searchWord}}</b>
-                            <span>{{item.score}}</span>
-                            <span>
+            <div class="searchbox">
+                <input type="serch" v-model="keywords" ref="searchs" :placeholder="defaultkeyword" maxlength="20"
+                       @keypress="searchsongs($event)">
+                <span class="iconfont iconguanbi" v-show="keywords.length!==0"
+                      @click="clearwords($refs.searchs)"></span>
+            </div>
+            <div class="singer">
+                <span class="iconfont iconuser"></span>
+            </div>
+        </div>
+        <div class="recommendedlist" v-show="searchflag">
+            <div class="title">
+                <b>热搜榜</b>
+            </div>
+            <div class="list" v-for="(item,i) in searchlist" :class="{'last':i==searchlist.length-1}"
+                 @click="keysearch(item.searchWord)">
+                <div class="rank" :class="{'red':i<=2}">{{i+1}}</div>
+                <div class="content">
+                    <div class="up">
+                        <b>{{item.searchWord}}</b>
+                        <span>{{item.score}}</span>
+                        <span>
                                     <img :src="item.iconUrl" alt="" v-if="item.iconUrl!==undefined"
                                          :class="{'speacial':item.iconType==5}">
                                 </span>
+                    </div>
+                    <div class="down">
+                        {{item.content}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="search-result">
+            <div id="top" ref="tabbar" :class="{'hideleft':searchflag}">
+                <div class="swiper-container" id="nav">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" v-for="(item,i)  in  searchtype" :key="i">
+                            <span :class="{'first':i==0}">{{item.name}}</span>
                         </div>
-                        <div class="down">
-                            {{item.content}}
+                        <div class="bar">
+                            <div class="color"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="search-result">
-                <div id="top" ref="tabbar" :class="{'hideleft':searchflag}">
-                    <div class="swiper-container" id="nav">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide" v-for="(item,i)  in  searchtype" :key="i">
-                                <span :class="{'first':i==0}">{{item.name}}</span> <!--:class="{'first':i==0}"-->
-                            </div>
-                            <div class="bar">
-                                <div class="color"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-container" id="page">
-                    <div class="swiper-wrapper">
-                        <!--综合-->
-                        <div class="swiper-slide slidepage songs comprehensive" v-cliheight>
-                            <div class="list-container">
-                                <div class="hole">
-                                    <div class="title" v-show="commonlist[0].length!==0">
-                                        <b>单曲</b>
-                                        <div class="playall">
-                                            <van-icon name="play-circle-o"></van-icon>
-                                            播放全部
-                                        </div>
+            <div class="swiper-container" id="page">
+                <div class="swiper-wrapper">
+                    <!--综合-->
+                    <div class="swiper-slide slidepage songs comprehensive" v-cliheight>
+                        <div class="list-container">
+                            <div class="hole">
+                                <div class="title" v-show="commonlist[0].length!==0">
+                                    <b>单曲</b>
+                                    <div class="playall">
+                                        <van-icon name="play-circle-o"></van-icon>
+                                        播放全部
                                     </div>
-                                    <div class="list" v-for="(item,i) in commonlist[0]" :key="i"
-                                         @click="pushPlay(item.id,item.name,item.artists,item.picUrl)">
-                                        <div class="left">
+                                </div>
+                                <div class="list" v-for="(item,i) in commonlist[0]" :key="i"
+                                     @click="pushPlay(item.id,item.name,item.artists,item.picUrl)">
+                                    <div class="left">
                                     <span>
                                         <b>{{item.name}}</b>
                                         <span v-if="item.alianame!==undefined">
                                             ({{item.alianame}})
                                         </span>
                                     </span>
-                                            <span v-if="item.artists"> {{item.artists|formatatists}} - {{item.alname}}</span>
-                                        </div>
-                                        <div class="right">
-                                            <span class="iconfont icongengduo1"></span>
-                                        </div>
+                                        <span v-if="item.artists"> {{item.artists|formatatists}} - {{item.alname}}</span>
                                     </div>
-                                    <div class="more-text">
-                                        <span>{{moreText}}</span>
-                                        <van-icon name="arrow"></van-icon>
+                                    <div class="right">
+                                        <span class="iconfont icongengduo1"></span>
                                     </div>
                                 </div>
-                                <div class="nofind" v-show="maxlength[0]==-1&&commonlist[0].length==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
-                                <div class="load" v-show="commonlist[0].length==0&&maxlength[0]!==-1"
-                                     style="top: 0;background: #fff;">
-                                    <van-loading color="#ff3f46"/>
+                                <div class="more-text">
+                                    <span>{{moreText}}</span>
+                                    <van-icon name="arrow"></van-icon>
                                 </div>
                             </div>
+                            <div class="nofind" v-show="maxlength[0]==-1&&commonlist[0].length==0">
+                                未找到与"{{lastkeywords}}"相关的内容
+                            </div>
+                            <div class="load" v-show="commonlist[0].length==0&&maxlength[0]!==-1"
+                                 style="top: 0;background: #fff;">
+                                <van-loading color="#ff3f46"/>
+                            </div>
                         </div>
-                        <!--单曲-->
-                        <div class="swiper-slide slidepage songs" v-cliheight>
+                    </div>
+                    <!--单曲-->
+                    <div class="swiper-slide slidepage songs" v-cliheight>
 
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="play-choice" v-show="commonlist[1].length!==0">
-                                        <div class="left">
-                                            <span><van-icon name="play-circle-o"></van-icon></span>
-                                            <span class="crls">播放全部</span>
-                                        </div>
-                                        <div class="right">
-                                            <span><van-icon name="bars"></van-icon></span>
-                                            <span class="ls">多选</span>
-                                        </div>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="play-choice" v-show="commonlist[1].length!==0">
+                                    <div class="left">
+                                        <span><van-icon name="play-circle-o"></van-icon></span>
+                                        <span class="crls">播放全部</span>
                                     </div>
-                                    <div class="list" @click="Single(item.id,item.name,item.artists)"
-                                         v-for="(item,i) in commonlist[1]" :key="i"
-                                         v-if="commonlist[1].length!==0"
-                                         :class="[{'last':i+1==commonlist[1].length},{'first-list':i==0}]">
-                                        <div class="left">
+                                    <div class="right">
+                                        <span><van-icon name="bars"></van-icon></span>
+                                        <span class="ls">多选</span>
+                                    </div>
+                                </div>
+                                <div class="list" @click="Single(item.id,item.name,item.artists)"
+                                     v-for="(item,i) in commonlist[1]" :key="i"
+                                     v-if="commonlist[1].length!==0"
+                                     :class="[{'last':i+1==commonlist[1].length},{'first-list':i==0}]">
+                                    <div class="left">
                                     <span>
                                         <b>{{item.name}}</b>
                                     </span>
-                                            <span v-if="item.artists">{{item.artists|formatatists}} - {{item.albumname}}</span>
-                                            <span v-if="item.alias.length!==0">{{item.alias[0]}}</span>
-                                        </div>
-                                        <div class="right">
-                                            <span class="iconfont iconmv" v-if="item.mvid!==0"></span> <!---->
-                                            <span class="iconfont icongengduo1"></span>
-                                        </div>
+                                        <span v-if="item.artists">{{item.artists|formatatists}} - {{item.albumname}}</span>
+                                        <span v-if="item.alias.length!==0">{{item.alias[0]}}</span>
                                     </div>
-                                </div>
-                                <div class="nofind" v-show="maxlength[1]==-1&&commonlist[1]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
-                                <div class="load"
-                                     :class="[{'bottomhide': commonlist[1]!==0||maxlength[1]==-1 },{'topshow':commonlist[1]==0&&maxlength[1]!==-1}]">
-                                    <van-loading color="#ff3f46"/>
+                                    <div class="right">
+                                        <span class="iconfont iconmv" v-if="item.mvid!==0"></span> <!---->
+                                        <span class="iconfont icongengduo1"></span>
+                                    </div>
                                 </div>
                             </div>
-
+                            <div class="nofind" v-show="maxlength[1]==-1&&commonlist[1]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
+                            </div>
+                            <div class="load"
+                                 :class="[{'bottomhide': commonlist[1]!==0||maxlength[1]==-1 },{'topshow':commonlist[1]==0&&maxlength[1]!==-1}]">
+                                <van-loading color="#ff3f46"/>
+                            </div>
                         </div>
-                        <!--视频-->
-                        <div class="swiper-slide slidepage video" v-cliheight>
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="video-list" v-for="(item,i) in commonlist[2]" :key="i"
-                                         :class="[{'list-end':i==commonlist[2].length-1},{'first-list':i==0}]">
-                                        <!--first-list-->
-                                        <div class="avatar">
-                                            <img :src="item.coverUrl" alt="">
-                                            <div class="playcount">
-                                                <span class="iconfont iconbofang2"></span>
-                                                <span>{{item.playTime|formatCount}}</span>
-                                            </div>
+
+                    </div>
+                    <!--视频-->
+                    <div class="swiper-slide slidepage video" v-cliheight>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="video-list" v-for="(item,i) in commonlist[2]" :key="i"
+                                     :class="[{'list-end':i==commonlist[2].length-1},{'first-list':i==0}]">
+                                    <!--first-list-->
+                                    <div class="avatar">
+                                        <img :src="item.coverUrl" alt="">
+                                        <div class="playcount">
+                                            <span class="iconfont iconbofang2"></span>
+                                            <span>{{item.playTime|formatCount}}</span>
                                         </div>
-                                        <div class="videoinfo">
-                                            <div class="title">
-                                                <div class="mv" v-if="item.type==0">MV</div>
-                                                <div class="des">{{item.title}}</div>
+                                    </div>
+                                    <div class="videoinfo">
+                                        <div class="title">
+                                            <div class="mv" v-if="item.type==0">MV</div>
+                                            <div class="des">{{item.title}}</div>
+                                        </div>
+                                        <div class="bottom">
+                                            <div class="duration">
+                                                {{item.durationms/1000|formatsongtime}}<!--formatsongtime-->
                                             </div>
-                                            <div class="bottom">
-                                                <div class="duration">
-                                                    {{item.durationms/1000|formatsongtime}}<!--formatsongtime-->
-                                                </div>
-                                                <div class="artists" v-if="item.creator">
-                                                    {{item.creator|formatatists}}
-                                                </div>
+                                            <div class="artists" v-if="item.creator">
+                                                {{item.creator|formatatists}}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="load"
-                                     :class="[
+                            </div>
+                            <div class="load"
+                                 :class="[
                                      {'bottomhide': commonlist[2]!==0||maxlength[2]==-1 },
                                      {'topshow':commonlist[2]==0&&maxlength[2]!==-1}]">
-                                    <!--  -->
-                                    <van-loading color="#ff3f46"/>
-                                </div>
-                                <div class="nofind" v-show="maxlength[2]==-1&&commonlist[2]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
+                                <!--  -->
+                                <van-loading color="#ff3f46"/>
                             </div>
-
+                            <div class="nofind" v-show="maxlength[2]==-1&&commonlist[2]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
+                            </div>
                         </div>
-                        <!--歌手-->
-                        <div class="swiper-slide slidepage singer" v-cliheight>
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="singerlist" v-for="(item,i) in commonlist[3]" :key="i"
-                                         :class="{'list-end':i==commonlist[3].length-1}">
-                                        <div class="avatar">
-                                            <div class="img">
-                                                <img :src="item.img1v1Url" alt="">
-                                            </div>
-                                            <div class="artist">
-                                                {{item.name}}
-                                            </div>
+
+                    </div>
+                    <!--歌手-->
+                    <div class="swiper-slide slidepage singer" v-cliheight>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="singerlist" v-for="(item,i) in commonlist[3]" :key="i"
+                                     :class="{'list-end':i==commonlist[3].length-1}">
+                                    <div class="avatar">
+                                        <div class="img">
+                                            <img :src="item.img1v1Url" alt="">
                                         </div>
-                                        <div class="right">
-                                            <div class="singericon">
-                                                <span class="iconfont iconuser"></span>
-                                            </div>
-                                            <div class="status">
-                                                已入驻
-                                            </div>
+                                        <div class="artist">
+                                            {{item.name}}
+                                        </div>
+                                    </div>
+                                    <div class="right">
+                                        <div class="singericon">
+                                            <span class="iconfont iconuser"></span>
+                                        </div>
+                                        <div class="status">
+                                            已入驻
                                         </div>
                                     </div>
                                 </div>
-                                <div class="load" :class="[
+                            </div>
+                            <div class="load" :class="[
                                 {'bottomhide': commonlist[3]!==0||maxlength[3]==-1 },
                                 {'topshow':commonlist[3]==0&&maxlength[3]!==-1}]"> <!--  -->
-                                    <van-loading color="#ff3f46"/>
-                                </div>
-                                <div class="nofind" v-show="maxlength[3]==-1&&commonlist[3]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
+                                <van-loading color="#ff3f46"/>
                             </div>
-
+                            <div class="nofind" v-show="maxlength[3]==-1&&commonlist[3]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
+                            </div>
                         </div>
-                        <!--专辑-->
-                        <div class="swiper-slide slidepage album" v-cliheight>
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="albumlist" v-for="(item,i) in commonlist[4]"
-                                         :class="{'list-end':i==commonlist[4].length-1}">
-                                        <div class="avatar">
-                                            <img :src="item.blurPicUrl" alt="">
-                                        </div>
-                                        <div class="title">
-                                            <div class="name">{{item.name}}</div>
-                                            <div class="artist">
-                                                <div class="art">{{item.artist}}</div>
-                                                <div class="date">{{item.publishTime|dateformat}}</div>
-                                            </div>
+
+                    </div>
+                    <!--专辑-->
+                    <div class="swiper-slide slidepage album" v-cliheight>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="albumlist" v-for="(item,i) in commonlist[4]"
+                                     :class="{'list-end':i==commonlist[4].length-1}">
+                                    <div class="avatar">
+                                        <img :src="item.blurPicUrl" alt="">
+                                    </div>
+                                    <div class="title">
+                                        <div class="name">{{item.name}}</div>
+                                        <div class="artist">
+                                            <div class="art">{{item.artist}}</div>
+                                            <div class="date">{{item.publishTime|dateformat}}</div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="load" :class="[
+                            </div>
+                            <div class="load" :class="[
                                 {'bottomhide': commonlist[4]!==0||maxlength[4]==-1 },
                                 {'topshow':commonlist[4]==0&&maxlength[4]!==-1}]"> <!--  -->
-                                    <van-loading color="#ff3f46"/>
-                                </div>
-                                <div class="nofind" v-show="maxlength[4]==-1&&commonlist[4]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
+                                <van-loading color="#ff3f46"/>
+                            </div>
+                            <div class="nofind" v-show="maxlength[4]==-1&&commonlist[4]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
                             </div>
                         </div>
-                        <!--歌单-->
-                        <div class="swiper-slide slidepage recommend" v-cliheight>
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="recommendlist" v-for="(item,i) in commonlist[5]"
-                                         :class="{'list-end':i==commonlist[5].length-1}">
-                                        <div class="avatar">
-                                            <img :src="item.coverImgUrl" alt="">
-                                        </div>
-                                        <div class="title">
-                                            <div class="name">{{item.name}}</div>
-                                            <div class="numinfo">
-                                                <div class="length">{{item.trackCount}}首</div>
-                                                <div class="by">by</div>
-                                                <div class="art">{{item.artist}}，播放{{item.playCount}}次</div>
-                                            </div>
+                    </div>
+                    <!--歌单-->
+                    <div class="swiper-slide slidepage recommend" v-cliheight>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="recommendlist" v-for="(item,i) in commonlist[5]"
+                                     :class="{'list-end':i==commonlist[5].length-1}">
+                                    <div class="avatar">
+                                        <img :src="item.coverImgUrl" alt="">
+                                    </div>
+                                    <div class="title">
+                                        <div class="name">{{item.name}}</div>
+                                        <div class="numinfo">
+                                            <div class="length">{{item.trackCount}}首</div>
+                                            <div class="by">by</div>
+                                            <div class="art">{{item.artist}}，播放{{item.playCount}}次</div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="load" :class="[
+                            </div>
+                            <div class="load" :class="[
                                 {'bottomhide': commonlist[5]!==0||maxlength[5]==-1 },
                                 {'topshow':commonlist[5]==0&&maxlength[5]!==-1}]"> <!--  -->
-                                    <van-loading color="#ff3f46"/>
-                                </div>
-                                <div class="nofind" v-show="maxlength[5]==-1&&commonlist[5]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
+                                <van-loading color="#ff3f46"/>
+                            </div>
+                            <div class="nofind" v-show="maxlength[5]==-1&&commonlist[5]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
                             </div>
                         </div>
-                        <!--电台-->
-                        <div class="swiper-slide slidepage radio" v-cliheight>
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="title" v-show="commonlist[6].length!==0">
-                                        <b>电台</b>
+                    </div>
+                    <!--电台-->
+                    <div class="swiper-slide slidepage radio" v-cliheight>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="title" v-show="commonlist[6].length!==0">
+                                    <b>电台</b>
+                                </div>
+                                <div class="radiolist" v-for="(item,i) in commonlist[6]" :key="i"
+                                     :class="{'list-end':i==commonlist[6].length-1}">
+                                    <div class="avatar">
+                                        <img :src="item.picUrl" alt="">
                                     </div>
-                                    <div class="radiolist" v-for="(item,i) in commonlist[6]" :key="i"
-                                         :class="{'list-end':i==commonlist[6].length-1}">
-                                        <div class="avatar">
-                                            <img :src="item.picUrl" alt="">
-                                        </div>
-                                        <div class="title">
-                                            <div class="name">{{item.name}}</div>
-                                            <div class="artist">
-                                                {{item.artist}}
-                                            </div>
+                                    <div class="title">
+                                        <div class="name">{{item.name}}</div>
+                                        <div class="artist">
+                                            {{item.artist}}
                                         </div>
                                     </div>
                                 </div>
-                                <div class="load" :class="[
+                            </div>
+                            <div class="load" :class="[
                                 {'bottomhide': commonlist[6]!==0||maxlength[6]==-1 },
                                 {'topshow':commonlist[6]==0&&maxlength[6]!==-1}]"> <!--  -->
-                                    <van-loading color="#ff3f46"/>
-                                </div>
-                                <div class="nofind" v-show="maxlength[6]==-1&&commonlist[6]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
+                                <van-loading color="#ff3f46"/>
+                            </div>
+                            <div class="nofind" v-show="maxlength[6]==-1&&commonlist[6]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
                             </div>
                         </div>
-                        <!--用户-->
-                        <div class="swiper-slide slidepage user" v-cliheight>
-                            <div class="list-container" v-cliheight>
-                                <div class="hole">
-                                    <div class="userlist" v-for="(item,i) in commonlist[7]" :key="i"
-                                         :class="{'list-end':i==commonlist[7].length-1}">
-                                        <div class="left">
-                                            <div class="avatar">
-                                                <img :src="item.avatarUrl" alt="">
-                                            </div>
-                                            <div class="userinfo">
-                                                <div class="nickname">
-                                                    <div class="name">{{item.nickname}}</div>
-                                                    <div class="gender">
+                    </div>
+                    <!--用户-->
+                    <div class="swiper-slide slidepage user" v-cliheight>
+                        <div class="list-container" v-cliheight>
+                            <div class="hole">
+                                <div class="userlist" v-for="(item,i) in commonlist[7]" :key="i"
+                                     :class="{'list-end':i==commonlist[7].length-1}">
+                                    <div class="left">
+                                        <div class="avatar">
+                                            <img :src="item.avatarUrl" alt="">
+                                        </div>
+                                        <div class="userinfo">
+                                            <div class="nickname">
+                                                <div class="name">{{item.nickname}}</div>
+                                                <div class="gender">
                                                     <span class="iconfont iconnv"
                                                           :class="[{'user-blue':item.gender==1},{'user-pink':item.gender==2}]"
                                                           v-if="item.gender!==0"></span>
-                                                    </div>
-                                                </div>
-                                                <div class="signature" v-adaptation
-                                                     v-if="item.signature.trim().length!==0">
-                                                    {{item.signature}}
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="attention">
-                                            + 关注
+                                            <div class="signature" v-adaptation
+                                                 v-if="item.signature.trim().length!==0">
+                                                {{item.signature}}
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="attention">
+                                        + 关注
+                                    </div>
                                 </div>
-                                <div class="load" :class="[
+                            </div>
+                            <div class="load" :class="[
                                 {'bottomhide': commonlist[7]!==0||maxlength[7]==-1 },
                                 {'topshow':commonlist[7]==0&&maxlength[7]!==-1}]"> <!--  -->
-                                    <van-loading color="#ff3f46"/>
-                                </div>
-                                <div class="nofind" v-show="maxlength[7]==-1&&commonlist[7]==0">
-                                    未找到与"{{lastkeywords}}"相关的内容
-                                </div>
+                                <van-loading color="#ff3f46"/>
+                            </div>
+                            <div class="nofind" v-show="maxlength[7]==-1&&commonlist[7]==0">
+                                未找到与"{{lastkeywords}}"相关的内容
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </transition>
+    </div>
 </template>
 <script>
     import SliderBound from '@/js/slider-rebound/slider-bound'
     import Asynchronous from '@/api/asyc/asyc'
     import slider from '@/js/sliderplugin/slider-plugin'
+    import {mapMutations} from 'vuex'
+
     export default {
         name: 'search',
         data() {
@@ -380,6 +379,7 @@
             }
         },
         methods: {
+            ...mapMutations(['InsertSearchResult']),
             clearwords(el) {
                 el.focus()
                 this.keywords = ''
@@ -453,7 +453,7 @@
                     c = c[0]
                 }
                 let that = this
-                this.$store.commit('InsertSearchResult', {
+                this.InsertSearchResult({
                     id, name, artist: c, picUrl,
                     call(flag, index) {
                         that.$parent.resetSong()

@@ -9,20 +9,18 @@ export default {
     },
     setSlider(callback) {
         const that = this
-        let ReferenceError
-        let navSlideWidth
-        let bar
-        let navSum
-        let clientWidth
-        let navWidth
-        let topBar
-        let startPosition
-        let slideProgress
-        let activeIndex
-        let activeSlidePosition
-        let navActiveSlideLeft
-        let clickIndex
-        let clickSlide
+        let navSlideWidth = 0
+        let bar =null
+        let navSum =0
+        let clientWidth =0
+        let navWidth = 0
+        let topBar = null
+        let slideProgress = 0
+        let activeIndex =0
+        let activeSlidePosition =0
+        let navActiveSlideLeft =0
+        let clickIndex =0
+        let clickSlide =null
         //暂时设计每个slide大小需要一致
         let barwidth = 36 //导航粉色条的长度px
         let tSpeed = 300 //切换速度300ms
@@ -36,20 +34,15 @@ export default {
                     navSlideWidth = this.slides.eq(0).css('width'); //导航字数需要统一,每个导航宽度一致
                     bar = this.$el.find('.bar')
                     bar.css('width', navSlideWidth)
-
-                    // that.transpeed(bar, 300)
                     bar.transition(tSpeed)
-
                     navSum = this.slides[this.slides.length - 1].offsetLeft //最后一个slide的位置
                     clientWidth = parseInt(this.$wrapperEl.css('width')) //Nav的可视宽度
-                    navWidth = 0
                     for (let i = 0; i < this.slides.length; i++) {
                         navWidth += parseInt(this.slides.eq(i).css('width'))
                     }
                     topBar = this.$el.parents('body').find('#top') //页头
 
                 },
-
             },
         });
         var pageSwiper = new Swiper('#page', {
@@ -127,7 +120,6 @@ export default {
             pageSwiper.slideTo(clickIndex, 300);
             this.slides.find('span').css('color', 'rgba(51,51,51,1)');
             clickSlide.find('span').css('color', 'rgb(255,21,76)');
-            // that.sli(this, 300, pageSwiper.previousIndex)
         })
         //内容滚动
         that.swipers.navSwiper = navSwiper

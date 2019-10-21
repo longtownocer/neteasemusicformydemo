@@ -34,7 +34,6 @@
         watch: {
             keywords(n, l) {
                 this.$emit('searchs', n, ((ret, indexs) => {
-                    console.log(ret)
                     this.$set(this, 'searchresult', ret)
                     this.$set(this, 'indexs', indexs)
                 }))

@@ -14,7 +14,7 @@ const state = {
     songinfo: {
         name: '老街',
         artist: '李荣浩',
-        audiosrc: '/resource/mp3/李荣浩 - 老街.mp3',
+        audiosrc: './resource/mp3/李荣浩 - 老街.mp3',
         pictrue_url: 'https://p1.music.126.net/fZFrplIVrHMx4lvgdqiIHQ==/42880953496261.jpg'
     },
     currentLyric: '',
@@ -29,16 +29,8 @@ const state = {
 //数据过滤实时获取
 const getters = {
     //获取保存的登录信息
-    getLoginInfo(state) {
-        return state.logininfo
-    },
-    getsongslist(state) {
-        return state.songslist
-    },
-    getsongsInfo(state) {
-        return state.songInfo
-    }
-
+    getLoginInfo: state => state.logininfo,
+    getsongslist:state => state.songslist,
 }
 //数据修改
 const mutations = {
@@ -90,13 +82,6 @@ const mutations = {
         }
         if (result) {
             //判断是否添加第一首
-            /*  if (state.currentindex == null) {
-                  state.currentindex = 0
-                  state.songslist.splice(state.currentindex, 0, n)
-              } else {
-                  console.log('添加了')
-
-              }*/
             state.songslist.splice(state.currentindex + 1, 0, n)
         }
         n.call && n.call(result, index)
