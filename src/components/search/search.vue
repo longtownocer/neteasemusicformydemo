@@ -62,8 +62,7 @@
                     播放全部
                   </div>
                 </div>
-                <div class="list" v-for="(item,i) in commonlist[0]" :key="i"
-                     @click="pushPlay(item.id,item.name,item.artists,item.picUrl)">
+                <div class="list" v-for="(item,i) in commonlist[0]" @click="pushPlay(item.id,item.name,item.artists,item.picUrl)" :key="i">
                   <div class="left">
                                     <span>
                                         <b>{{item.name}}</b>
@@ -164,10 +163,7 @@
                 </div>
               </div>
               <div class="load"
-                   :class="[
-                                     {'bottomhide': commonlist[2]!==0||maxlength[2]==-1 },
-                                     {'topshow':commonlist[2]==0&&maxlength[2]!==-1}]">
-                <!--  -->
+                   :class="[ {'bottomhide': commonlist[2]!==0||maxlength[2]==-1 },{'topshow':commonlist[2]==0&&maxlength[2]!==-1}]">
                 <van-loading color="#ff3f46"/>
               </div>
               <div class="nofind" v-show="maxlength[2]==-1&&commonlist[2]==0">
@@ -312,7 +308,9 @@
                       <div class="nickname">
                         <div class="name">{{item.nickname}}</div>
                         <div class="gender">
-                          <span class="iconfont iconnv" :class="[{'user-blue':item.gender==1},{'user-pink':item.gender==2}]" v-if="item.gender!==0"></span>
+                          <span class="iconfont iconnv"
+                                :class="[{'user-blue':item.gender==1},{'user-pink':item.gender==2}]"
+                                v-if="item.gender!==0"></span>
                         </div>
                       </div>
                       <div class="signature" v-adaptation
@@ -326,9 +324,8 @@
                   </div>
                 </div>
               </div>
-              <div class="load" :class="[
-                                {'bottomhide': commonlist[7]!==0||maxlength[7]==-1 },
-                                {'topshow':commonlist[7]==0&&maxlength[7]!==-1}]"> <!--  -->
+              <div class="load"
+                   :class="[{'bottomhide': commonlist[7]!==0||maxlength[7]==-1 },{'topshow':commonlist[7]==0&&maxlength[7]!==-1}]">
                 <van-loading color="#ff3f46"/>
               </div>
               <div class="nofind" v-show="maxlength[7]==-1&&commonlist[7]==0">
@@ -820,7 +817,6 @@
       this.getsearchkeywords().then((ret) => {
         this.defaultkeyword = ret.data.showKeyword
         this.realkeyword = ret.data.realkeyword
-
       })
     },
     mounted() {
