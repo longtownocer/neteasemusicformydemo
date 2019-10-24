@@ -72,7 +72,7 @@
           </div>
         </div>
         <!-- 中间动画 歌词 -->
-        <div class="center-info" v-basictop @click="imgtolrc">
+        <div class="center-info" @click="imgtolrc">
           <div class="center" v-show="inturn">
             <div class="center-animate">
               <img :src="songinfo.pictrue_url" alt="">
@@ -203,6 +203,9 @@
       },
       showsongsplayinfo(e) {
         this.showplay = true
+        this.$nextTick(() => {
+          this.scrollTo(this.currentLineNum)
+        })
       },
       onChange(value, el) {
         if (el.duration) {
@@ -342,6 +345,14 @@
         this.clearLyric()
         this.resetLyricposition()
       },
+      playLoop() {
+        this.$refs.audio.currentTime = 0
+        this.seek(0)
+        this.value = 0
+        this.playflag = true
+        this.$refs.audio.play()
+        this.setlyric(this.$store.state.currentLyric)
+      },
       prev() {
         if (this.songslist.length == 0) {
           return window.confirm('歌曲列表为空')
@@ -364,12 +375,7 @@
           }
           this.playsong(randomnum, this.songslist[randomnum].id)
         } else if (this.mode == 'loop') {
-          this.$refs.audio.currentTime = 0
-          this.seek(0)
-          this.value = 0
-          this.playflag = true
-          this.$refs.audio.play()
-          this.setlyric(this.$store.state.currentLyric)
+          this.playLoop()
         }
 
       },
@@ -395,12 +401,7 @@
           }
           this.playsong(randomnum, this.songslist[randomnum].id)
         } else if (this.mode == 'loop') {
-          this.$refs.audio.currentTime = 0
-          this.seek(0)
-          this.value = 0
-          this.playflag = true
-          this.$refs.audio.play()
-          this.setlyric(this.$store.state.currentLyric)
+          this.playLoop()
         }
       },
       end() {
@@ -573,11 +574,7 @@
     filters: {},
     components: {},
     directives: {
-      'basictop': {
-        bind(el) {
-          // el.style.height = (document.documentElement.clientHeight - 230) + 'px'
-        }
-      }
+
     }
   }
 </script>
